@@ -7,32 +7,34 @@
 #
 # ---- index page ----
 import locale
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 def index():
 
     return dict()
 
 # ---- sales page ----
 def sales():
-    edit = A(SPAN(_class = 'glyphicon glyphicon-align-left'), _title="Update", _href=URL('#'))
-    prin = A(SPAN(_class = 'glyphicon glyphicon-align-left'), _title="Print", _href=URL("#"))
-    btn_lnks = DIV(prin, edit, _class="hidden-sm hidden-xs action-buttons")
 
-
-
+# <div class="btn-group" role="group" aria-label="...">
+#   <button type="button" class="btn btn-default">Left</button>
+#   <button type="button" class="btn btn-default">Middle</button>
+#   <button type="button" class="btn btn-default">Right</button>
+# </div>
+    #DIV(BUTTON(SPAN(_class='ace-icon fa fa-times'),_type='button', _class='close', **{'_data-dismiss':'alert'}),DIV(SPAN(_class='ace-icon fa fa-info-circle smaller-130'),B(' Info: '), 'Latest Company Fleet', _class='white'),_class='alert alert-info')
+    view = BUTTON('view', _type='button', _class='btn btn-primary btn-sm')
+    edit = BUTTON('edit', _type='button', _class='btn btn-success btn-sm')
+    dele = BUTTON('delete', _type='button', _class='btn btn-danger btn-sm')
+    btn = DIV(view, edit, dele, _class='btn-group', _role='group')
     row = []
     head = THEAD(TR(TD('Date'),TD('Vouno'),TD('Customer'),TD('Total'),TD('Paid'),TD('Balance'),TD('Status'),TD('Actions')))
     for q in db().select(db.trnvou.ALL):
-        row.append(TR(TD(q.Dte),TD(q.Vouno),TD(q.Client),TD(locale.format('%.2F',q.Totamount or 0, grouping = True), _align='right'),TD(),TD(),TD(),TD(btn_lnks)))
+        row.append(TR(TD(q.Dte),TD(q.Vouno),TD(q.Client),TD(locale.format('%.2f',q.Totamount, grouping = True), _align='right'),TD(),TD(),TD(),TD(btn)))
     body = TBODY(*row)
     table = TABLE(*[head, body], _class='table table-striped table-bordered table-hover')
     return dict(table = table)
 
 # ---- products page ----
 def products():
-    # <div class="btn-group">
-    #     <a class="tip btn btn-primary btn-xs" title="" href="#" data-original-title="Edit Product"><i class="fa fa-edit"></i></a>
-    #     <a class="tip btn btn-danger btn-xs" title="" href="#" onclick="return confirm('You are going to remove this product. Press OK to proceed and Cancel to Go Back')" data-original-title="Delete Product"><i class="fa fa-trash-o"></i></a>
-    # </div>
     row = []
     head = THEAD(TR(TH('Ref_No'),TH('Ref_No2'),TH('Ref_No3'),TH('Description'),TH('Brand Line'),TH()))
     for q in db().select(db.itemmas.ALL):
