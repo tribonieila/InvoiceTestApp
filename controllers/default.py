@@ -21,6 +21,7 @@ def sales():
 #   <button type="button" class="btn btn-default">Right</button>
 # </div>
     #DIV(BUTTON(SPAN(_class='ace-icon fa fa-times'),_type='button', _class='close', **{'_data-dismiss':'alert'}),DIV(SPAN(_class='ace-icon fa fa-info-circle smaller-130'),B(' Info: '), 'Latest Company Fleet', _class='white'),_class='alert alert-info')
+    # view = BUTTON(IMG(_type="image/svg+xml",_src=URL('static','images/svg/si-glyph-bed.svg')), _type='button', _class='btn btn-primary btn-sm')
     view = BUTTON('view', _type='button', _class='btn btn-primary btn-sm')
     edit = BUTTON('edit', _type='button', _class='btn btn-success btn-sm')
     dele = BUTTON('delete', _type='button', _class='btn btn-danger btn-sm')

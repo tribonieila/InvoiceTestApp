@@ -1,4 +1,7 @@
-
+.glyph-icon svg {
+width:16px;
+height:16px;
+}
 /* Label colors */
 
 .label.label-success,
