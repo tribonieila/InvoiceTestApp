@@ -152,6 +152,7 @@ if configuration.get('scheduler.enabled'):
 # after defining tables, uncomment below to enable auditing
 # -------------------------------------------------------------------------
 # auth.enable_record_versioning(db)
+#
 db = DAL('postgres://root:admin@localhost/TestApp')
 
 db.define_table('itemmas',
