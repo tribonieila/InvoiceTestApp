@@ -1,0 +1,107 @@
+{{extend 'layout.html'}}
+<script type="text/javascript" src="{{=URL('static','js/jquery.sheepItPlugin-1.1.1.min.js')}}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.4.0/jquery.js"></script>
+
+<style type="text/css">
+
+#sheepItForm_controls div, #sheepItForm_controls div input {
+    float:left;    
+    margin-right: 10px;
+}
+
+td {
+  padding:4px;
+}
+
+
+</style>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h3 class="h2">Add Sales</h3>
+    <small class="text-muted">Please use the form below to enter new sale. </small>
+</div>
+
+<form>
+ <div id="sheepItForm">
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="Inv">Invoice No.</label>
+      <input type="text" class="form-control" id="Inv" placeholder="Invoice No.">
+    </div>
+    <div class="form-group col-md-6">
+      <label for="customer">Customer</label>
+      <input type="text" class="form-control" id="customer" placeholder="Customer">
+    </div>
+  </div>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Reference No</th>
+      <th scope="col">Quantity</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td><input type="text" class="form-control" id="refno" placeholder="Reference No"></td>
+      <td><input type="text" class="form-control" id="qty" placeholder="Quantity"></td>
+      <td><a class="btn btn-danger" href="#" role="button">x</a></td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+        <td colspan="4">
+        <div>
+            <div id="sheepItForm_add">
+            <a class="btn btn-success" href="#" role="button">Add</a></div>
+            <a class="btn btn-danger" href="#" role="button">Remove</a>
+            <a class="btn btn-danger" href="#" role="button">Remove All</a>
+        </div>
+        </td>
+    </tr>
+  </tfoot>
+</table>
+  <button type="submit" class="btn btn-primary">Save Invoice</button>
+</div>
+</form>
+<script type="text/javascript">
+jQuery.noConflict();
+jQuery(document).ready(function($) {
+     
+    var sheepItForm = $('#sheepItForm').sheepIt({
+        separator: '',
+        allowRemoveLast: true,
+        allowRemoveCurrent: true,
+        allowRemoveAll: true,
+        allowAdd: true,
+        allowAddN: true,
+        
+        // Limits
+        maxFormsCount: 100,
+        minFormsCount: 0,
+        iniFormsCount: 1,
+        
+        removeLastConfirmationMsg: 'Are your sure?',
+        removeCurrentConfirmationMsg: 'Are your sure?',
+        removeAllConfirmationMsg: 'Are your sure?',
+        
+        afterAdd: function(source, newForm) {
+            
+            // Add events for focus to the new cloned form
+            $(newForm).find('input').focus(function() {
+                $(this).addClass("focus");
+            });
+            $(newForm).find('input').blur(function() {
+                $(this).removeClass("focus");
+            });
+            
+        }      
+    });
+ 
+});
+
+</script>
+
+
+
