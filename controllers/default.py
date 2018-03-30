@@ -7,7 +7,7 @@
 #
 # ---- index page ----
 import locale
-locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+# locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 def index():
 
     return dict()
@@ -33,7 +33,32 @@ def sales():
     body = TBODY(*row)
     table = TABLE(*[head, body], _class='table table-striped table-bordered table-hover')
     return dict(table = table)
-
+# ---- add sale page ----
+def addsale():
+    forms = FORM(DIV(LABEL('Paid By: ',_class='col-sm-2'),SELECT('Cash','Credit','Fuel Card', _type='text', _id='paid_by', _name='paid_by',_placeholder='Paid By' ,_class='col-sx-10')),
+        DIV(_class='space space-8'),
+        DIV(LABEL('Station: ',_class='col-sm-2'),INPUT(_type='text', _id='station',_name='station', _placeholder='Station')),DIV(_class='space space-8'),
+        TABLE(THEAD(TR(TH('#'),TH('Date'),TH('Reg.No.'),TH('Amount'),TH('Remarks'),TH())),
+        TBODY(TR(TD(SPAN(_id='sheepItForm_label')),
+            TD(INPUT(_class='date col-xs-10 col-sm-10', _value=request.now.date(), _id='date_expense', _name="date_expense")),
+            TD(SELECT(_class='col-xs-10 col-sm-10', _id='reg_no_id', _name='reg_no_id')),
+            TD(INPUT(_class='col-xs-10 col-sm-10', _id='amount', _value=0, _name='amount')),
+            TD(INPUT(_class='col-xs-10 col-sm-15', _id='remarks',_type='text', _name='remarks')),
+            TD(INPUT(_id='counter',_type='hidden', _name='counter')),
+            TD(A(SPAN(_class='ace-icon fa fa-times-circle bigger-120 '),_class='btn btn-danger btn-xs', _id='sheepItForm_remove_current', _name = 'sheepItForm_remove_current')),_id="sheepItForm_template"),TR(TD('No Entry Field',_colspan='6'),_id="sheepItForm_noforms_template"),_id="sheepItForm"),
+        TFOOT(TR(TD(DIV(
+            DIV(A(SPAN(' Add',_class='ace-icon fa fa-plus-circle bigger-120'),_class='btn btn-success btn-xs'), _id='sheepItForm_add'),
+            DIV(A(SPAN(' Remove',_class='ace-icon fa fa-minus-circle bigger-120'),_class='btn btn-danger btn-xs'),_id='sheepItForm_remove_last'),
+            DIV(A(SPAN(' Remove All', _class='ace-icon fa fa-times-circle bigger-120'),_class='btn btn-danger btn-xs'),_id='sheepItForm_remove_all'),_id='sheepItForm_controls'),_colspan='6'))),_class='table table-striped'),
+    DIV(_class='space space-8'),
+    INPUT(_type='submit', _value='submit', _class='btn btn-primary'))
+    form = SQLFORM.factory(
+        Field('dte', 'date', default = request.now, label='Date'),
+        Field('Invoi', 'integer', label = 'Invoice No.'),
+        Field('Customer', 'string'),
+        Field('Refno', 'string'),
+        Field('qty', 'integer'))
+    return dict(form = form)
 # ---- products page ----
 def products():
     row = []
