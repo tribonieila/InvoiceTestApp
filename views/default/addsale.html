@@ -1,11 +1,11 @@
 {{extend 'layout.html'}}
-<script type="text/javascript" src="{{=URL('static','js/jquery.sheepItPlugin-1.1.1.min.js')}}"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.4.0/jquery.js"></script>
+<script type="text/javascript" src="{{=URL('static','js/jquery-1.4.min.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','js/jquery.sheepItPlugin.js')}}"></script>
 
 <style type="text/css">
 
 #sheepItForm_controls div, #sheepItForm_controls div input {
-    float:left;    
+    float:left;
     margin-right: 10px;
 }
 
@@ -21,7 +21,7 @@ td {
 </div>
 
 <form>
- <div id="sheepItForm">
+
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="Inv">Invoice No.</label>
@@ -37,38 +37,78 @@ td {
     <tr>
       <th scope="col">#</th>
       <th scope="col">Reference No</th>
+      <th scope="col">Description</th>
       <th scope="col">Quantity</th>
+      <th scope="col">Price</th>
+      <th scope="col">Total</th>
       <th scope="col"></th>
     </tr>
   </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td><input type="text" class="form-control" id="refno" placeholder="Reference No"></td>
-      <td><input type="text" class="form-control" id="qty" placeholder="Quantity"></td>
-      <td><a class="btn btn-danger" href="#" role="button">x</a></td>
+  <tbody id="sheepItForm">
+
+    <tr id="sheepItForm_template">
+      <td id='sheepItForm_label' for="sheepItForm_#index#_ref"></td>
+      <td><input type="text" class="form-control" id="sheepItForm_#index#_refno" name="refno[refno][#index#][refno]"placeholder="Reference No"></td>
+      <td></td>
+      <td><input type="number" class="form-control" id="qty" placeholder="Quantity"></td>
+      <td></td><td></td>
+      <td><a id="sheepItForm_remove_current" class="btn btn-danger" href="#" role="button">x</a></td>
+
     </tr>
+    <tr id="sheepItForm_noforms_template"></td>
   </tbody>
   <tfoot>
     <tr>
-        <td colspan="4">
+      <td colspan="5" align="right"><B>Total:</B></td>
+      <td colspan="2"></td>
+    </tr>
+    <tr>
+      <td colspan="5" align="right"><B>Discount:</B></td>
+      <td colspan="2"></td>
+      <!-- <td><input type="integer" class="form-control" id="discount" placeholder="%"></td></td> -->
+
+    </tr>
+    <tr>
+      <td colspan="5" align="right"><B>Total Amount:</B></td>
+      <td colspan="2"></td>
+
+
+    </tr>
+    <tr>
+        <td colspan="7">
         <div>
-            <div id="sheepItForm_add">
-            <a class="btn btn-success" href="#" role="button">Add</a></div>
-            <a class="btn btn-danger" href="#" role="button">Remove</a>
-            <a class="btn btn-danger" href="#" role="button">Remove All</a>
+            <a id="sheepItForm_add" class="btn btn-success" href="#" role="button">Add</a>
+            <a id="sheepItForm_remove_last" class="btn btn-danger" href="#" role="button">Remove</a>
+            <a id="sheepItForm_remove_all" class="btn btn-danger" href="#" role="button">Remove All</a>
         </div>
         </td>
+
     </tr>
+
   </tfoot>
 </table>
   <button type="submit" class="btn btn-primary">Save Invoice</button>
-</div>
+
 </form>
+<style>
+
+a {
+
+    color:#00F;
+    cursor:pointer;
+}
+
+#sheepItForm_controls div, #sheepItForm_controls div input {
+    float:left;
+    margin-right: 10px;
+}
+
+
+</style>
 <script type="text/javascript">
 jQuery.noConflict();
 jQuery(document).ready(function($) {
-     
+
     var sheepItForm = $('#sheepItForm').sheepIt({
         separator: '',
         allowRemoveLast: true,
@@ -76,32 +116,11 @@ jQuery(document).ready(function($) {
         allowRemoveAll: true,
         allowAdd: true,
         allowAddN: true,
-        
-        // Limits
-        maxFormsCount: 100,
+        maxFormsCount: 10,
         minFormsCount: 0,
-        iniFormsCount: 1,
-        
-        removeLastConfirmationMsg: 'Are your sure?',
-        removeCurrentConfirmationMsg: 'Are your sure?',
-        removeAllConfirmationMsg: 'Are your sure?',
-        
-        afterAdd: function(source, newForm) {
-            
-            // Add events for focus to the new cloned form
-            $(newForm).find('input').focus(function() {
-                $(this).addClass("focus");
-            });
-            $(newForm).find('input').blur(function() {
-                $(this).removeClass("focus");
-            });
-            
-        }      
+        iniFormsCount: 2
     });
- 
+
 });
 
 </script>
-
-
-

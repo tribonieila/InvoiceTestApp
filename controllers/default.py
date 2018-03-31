@@ -4,7 +4,9 @@
 # this file is released under public domain and you can use without limitations
 # -------------------------------------------------------------------------
 # https://sim.tecdiary.com
-#
+# sudo service postgresql restart
+# sheepItForm
+# c:\python27\python c:\fleetmgt\web_fleet.py -a admin -i 192.7.1.249 -p 80
 # ---- index page ----
 import locale
 # locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
@@ -14,44 +16,23 @@ def index():
 
 # ---- sales page ----
 def sales():
-
-# <div class="btn-group" role="group" aria-label="...">
-#   <button type="button" class="btn btn-default">Left</button>
-#   <button type="button" class="btn btn-default">Middle</button>
-#   <button type="button" class="btn btn-default">Right</button>
-# </div>
-    #DIV(BUTTON(SPAN(_class='ace-icon fa fa-times'),_type='button', _class='close', **{'_data-dismiss':'alert'}),DIV(SPAN(_class='ace-icon fa fa-info-circle smaller-130'),B(' Info: '), 'Latest Company Fleet', _class='white'),_class='alert alert-info')
-    # view = BUTTON(IMG(_type="image/svg+xml",_src=URL('static','images/svg/si-glyph-bed.svg')), _type='button', _class='btn btn-primary btn-sm')
-    view = BUTTON('view', _type='button', _class='btn btn-primary btn-sm')
-    edit = BUTTON('edit', _type='button', _class='btn btn-success btn-sm')
-    dele = BUTTON('delete', _type='button', _class='btn btn-danger btn-sm')
-    btn = DIV(view, edit, dele, _class='btn-group', _role='group')
     row = []
     head = THEAD(TR(TD('Date'),TD('Vouno'),TD('Customer'),TD('Total'),TD('Paid'),TD('Balance'),TD('Status'),TD('Actions')))
     for q in db().select(db.trnvou.ALL):
+        #A('Fuel', _href=URL('default', 'Fuel', args=n.vehicle.id))
+        view = BUTTON('view', _type='button', _class='btn btn-primary btn-sm')
+        edit = A('edit', _class='btn btn-success btn-sm', _href=URL('default', 'editsale', args=q.id))
+        #edit = BUTTON('edit', _type='button', _class='btn btn-success btn-sm', _href="URL("editsale", args=q.trnvou.id))
+        dele = BUTTON('delete', _type='button', _class='btn btn-danger btn-sm')
+        btn = DIV(view, edit, dele, _class='btn-group', _role='group')
+
         row.append(TR(TD(q.Dte),TD(q.Vouno),TD(q.Client),TD(locale.format('%.2f',q.Totamount, grouping = True), _align='right'),TD(),TD(),TD(),TD(btn)))
     body = TBODY(*row)
     table = TABLE(*[head, body], _class='table table-striped table-bordered table-hover')
     return dict(table = table)
+
 # ---- add sale page ----
 def addsale():
-    forms = FORM(DIV(LABEL('Paid By: ',_class='col-sm-2'),SELECT('Cash','Credit','Fuel Card', _type='text', _id='paid_by', _name='paid_by',_placeholder='Paid By' ,_class='col-sx-10')),
-        DIV(_class='space space-8'),
-        DIV(LABEL('Station: ',_class='col-sm-2'),INPUT(_type='text', _id='station',_name='station', _placeholder='Station')),DIV(_class='space space-8'),
-        TABLE(THEAD(TR(TH('#'),TH('Date'),TH('Reg.No.'),TH('Amount'),TH('Remarks'),TH())),
-        TBODY(TR(TD(SPAN(_id='sheepItForm_label')),
-            TD(INPUT(_class='date col-xs-10 col-sm-10', _value=request.now.date(), _id='date_expense', _name="date_expense")),
-            TD(SELECT(_class='col-xs-10 col-sm-10', _id='reg_no_id', _name='reg_no_id')),
-            TD(INPUT(_class='col-xs-10 col-sm-10', _id='amount', _value=0, _name='amount')),
-            TD(INPUT(_class='col-xs-10 col-sm-15', _id='remarks',_type='text', _name='remarks')),
-            TD(INPUT(_id='counter',_type='hidden', _name='counter')),
-            TD(A(SPAN(_class='ace-icon fa fa-times-circle bigger-120 '),_class='btn btn-danger btn-xs', _id='sheepItForm_remove_current', _name = 'sheepItForm_remove_current')),_id="sheepItForm_template"),TR(TD('No Entry Field',_colspan='6'),_id="sheepItForm_noforms_template"),_id="sheepItForm"),
-        TFOOT(TR(TD(DIV(
-            DIV(A(SPAN(' Add',_class='ace-icon fa fa-plus-circle bigger-120'),_class='btn btn-success btn-xs'), _id='sheepItForm_add'),
-            DIV(A(SPAN(' Remove',_class='ace-icon fa fa-minus-circle bigger-120'),_class='btn btn-danger btn-xs'),_id='sheepItForm_remove_last'),
-            DIV(A(SPAN(' Remove All', _class='ace-icon fa fa-times-circle bigger-120'),_class='btn btn-danger btn-xs'),_id='sheepItForm_remove_all'),_id='sheepItForm_controls'),_colspan='6'))),_class='table table-striped'),
-    DIV(_class='space space-8'),
-    INPUT(_type='submit', _value='submit', _class='btn btn-primary'))
     form = SQLFORM.factory(
         Field('dte', 'date', default = request.now, label='Date'),
         Field('Invoi', 'integer', label = 'Invoice No.'),
@@ -59,6 +40,13 @@ def addsale():
         Field('Refno', 'string'),
         Field('qty', 'integer'))
     return dict(form = form)
+
+# ---- add sale page ----
+def editsale():
+    _id = db.trnvou(request.args(0)) #or redirect(URL('error'))
+    form = SQLFORM(db.trnvou, _id, showid = False)
+    return dict(form = form)
+
 # ---- products page ----
 def products():
     row = []
@@ -126,3 +114,21 @@ def download():
     http://..../[app]/default/download/[filename]
     """
     return response.download(request, db)
+
+    # forms = FORM(DIV(LABEL('Paid By: ',_class='col-sm-2'),SELECT('Cash','Credit','Fuel Card', _type='text', _id='paid_by', _name='paid_by',_placeholder='Paid By' ,_class='col-sx-10')),
+    #     DIV(_class='space space-8'),
+    #     DIV(LABEL('Station: ',_class='col-sm-2'),INPUT(_type='text', _id='station',_name='station', _placeholder='Station')),DIV(_class='space space-8'),
+    #     TABLE(THEAD(TR(TH('#'),TH('Date'),TH('Reg.No.'),TH('Amount'),TH('Remarks'),TH())),
+    #     TBODY(TR(TD(SPAN(_id='sheepItForm_label')),
+    #         TD(INPUT(_class='date col-xs-10 col-sm-10', _value=request.now.date(), _id='date_expense', _name="date_expense")),
+    #         TD(SELECT(_class='col-xs-10 col-sm-10', _id='reg_no_id', _name='reg_no_id')),
+    #         TD(INPUT(_class='col-xs-10 col-sm-10', _id='amount', _value=0, _name='amount')),
+    #         TD(INPUT(_class='col-xs-10 col-sm-15', _id='remarks',_type='text', _name='remarks')),
+    #         TD(INPUT(_id='counter',_type='hidden', _name='counter')),
+    #         TD(A(SPAN(_class='ace-icon fa fa-times-circle bigger-120 '),_class='btn btn-danger btn-xs', _id='sheepItForm_remove_current', _name = 'sheepItForm_remove_current')),_id="sheepItForm_template"),TR(TD('No Entry Field',_colspan='6'),_id="sheepItForm_noforms_template"),_id="sheepItForm"),
+    #     TFOOT(TR(TD(DIV(
+    #         DIV(A(SPAN(' Add',_class='ace-icon fa fa-plus-circle bigger-120'),_class='btn btn-success btn-xs'), _id='sheepItForm_add'),
+    #         DIV(A(SPAN(' Remove',_class='ace-icon fa fa-minus-circle bigger-120'),_class='btn btn-danger btn-xs'),_id='sheepItForm_remove_last'),
+    #         DIV(A(SPAN(' Remove All', _class='ace-icon fa fa-times-circle bigger-120'),_class='btn btn-danger btn-xs'),_id='sheepItForm_remove_all'),_id='sheepItForm_controls'),_colspan='6'))),_class='table table-striped'),
+    # DIV(_class='space space-8'),
+    # INPUT(_type='submit', _value='submit', _class='btn btn-primary'))
