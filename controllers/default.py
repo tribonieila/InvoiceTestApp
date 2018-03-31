@@ -33,23 +33,24 @@ def sales():
 
 # ---- add sale page ----
 def addsale():
-    auto = db().select(db.itemmas.Ref_No)
+    refno = db().select(db.itemmas.Ref_No)
     form = SQLFORM.factory(
         Field('counter', 'integer'),
         Field('dte', 'date', default = request.now, label='Date'),
         Field('Invoi', 'integer', label = 'Invoice No.'),
         Field('Customer', 'string'),
-        Field('Ref_No', 'string', widget = SQLFORM.widgets.autocomplete(request, db.itemmas.Ref_No,
-            id_field = db.itemmas.id, limitby = (0,10), min_length = 2)),
+        Field('Ref_No', widget = SQLFORM.widgets.autocomplete(request, db.itemmas.Ref_No,  id_field=db.itemmas.id, limitby=(0,10), min_length=2)),
         Field('qty', 'integer'))
     if form.accepts(request):
-        _range = xrange(len(request.vars['counter']))
-        if len(_range) <= 1:
-            print "1 range"
-        else:
-            for v in _range:
-                print form.bars['RefNo'][v]
-    return dict(form = form, auto = auto)
+        # _range = xrange(len(request.vars['counter']))
+        ref = db(db.itemmas.Ref_No == form.vars.Ref_No).select(db.itemmas.Descrip).first()
+        print ref
+        # if len(_range) <= 1:
+        #     print "1 range"
+        # else:
+        #     for v in _range:
+        #         print form.bars['RefNo'][v]
+    return dict(form = form, refno = refno)
 
 # ---- add sale page ----
 def editsale():
