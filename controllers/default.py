@@ -26,13 +26,41 @@ def sales():
         dele = BUTTON('delete', _type='button', _class='btn btn-danger btn-sm')
         btn = DIV(view, edit, dele, _class='btn-group', _role='group')
 
-        row.append(TR(TD(q.Dte),TD(q.Vouno),TD(q.Client),TD(locale.format('%.2f',q.Totamount, grouping = True), _align='right'),TD(),TD(),TD(),TD(btn)))
+        row.append(TR(TD(q.Dte),TD(q.Vouno),TD(q.Client),TD((q.Totamount), _align='right'),TD(),TD(),TD(),TD(btn)))
     body = TBODY(*row)
     table = TABLE(*[head, body], _class='table table-striped table-bordered table-hover')
     return dict(table = table)
 
 # ---- add sale page ----
 def addsale():
+    form = FORM(DIV(LABEL('Invoice No: ',_class='col-sm-2'), INPUT(_type='text', _id='inv',_name='inv', _placeholder='Invoice No', _class='form-control')),
+        DIV(_class='space space-8'),
+        DIV(LABEL('Customer Name: ',_class='col-sm-2'),INPUT(_type='text', _id='customer',_name='customer', _placeholder='Customer', _class='form-control')),DIV(_class='space space-8'),
+        TABLE(THEAD(TR(TH('#'),TH('Reference No'),TH('Quantity'),TH())),
+        TBODY(TR(TD(SPAN(_id='sheepItForm_label')),
+            TD(INPUT(_class='form-control', _id='refno', _name='refno', _widget = SQLFORM.widgets.autocomplete(request, db.itemmas.Ref_No,
+                id_field = db.itemmas.id, limitby = (0,10), min_length = 2))),
+            TD(INPUT(_class='form-control', _id='qty',_type='text', _name='qty')),
+
+            TD(INPUT(_id='counter',_type='hidden', _name='counter'),A(SPAN(_class='ace-icon fa fa-times-circle bigger-120 '),'x',_class='btn btn-danger btn-xs', _id='sheepItForm_remove_current', _name = 'sheepItForm_remove_current')),_id="sheepItForm_template"),
+            TR(TD('No Entry Field',_colspan='6'),_id="sheepItForm_noforms_template"),_id="sheepItForm"),
+        TFOOT(TR(TD(DIV(
+            DIV(A(SPAN(' Add',_class='ace-icon fa fa-plus-circle bigger-120'),_class='btn btn-success btn-xs'), _id='sheepItForm_add'),
+            DIV(A(SPAN(' Remove',_class='ace-icon fa fa-minus-circle bigger-120'),_class='btn btn-danger btn-xs'),_id='sheepItForm_remove_last'),
+            DIV(A(SPAN(' Remove All', _class='ace-icon fa fa-times-circle bigger-120'),_class='btn btn-danger btn-xs'),_id='sheepItForm_remove_all'),_id='sheepItForm_controls'),_colspan='6'))),_class='table table-striped'),
+    DIV(_class='space space-8'),
+    INPUT(_type='submit', _value='submit', _class='btn btn-primary'))
+    if form.process().accepted:
+        _range = xrange(len(request.vars['counter']))
+        if len(_range) <= 1:
+            db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
+            db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.inv, Ref_No=form.vars.refno, Qty=form.vars.qty)
+        else:
+            for i in _range:
+                db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
+                db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.inv, Ref_No=form.vars['refno'][i], Qty=form.vars['qty'][i])
+    return dict(form = form)
+def addsales():
     refno = db().select(db.itemmas.Ref_No)
     form = SQLFORM.factory(
         Field('counter', 'integer'),
@@ -41,12 +69,15 @@ def addsale():
         Field('Customer', 'string'),
         Field('Ref_No', widget = SQLFORM.widgets.autocomplete(request, db.itemmas.Ref_No,  id_field=db.itemmas.id, limitby=(0,10), min_length=2)),
         Field('qty', 'integer'))
-    if form.accepts(request):
-        # _range = xrange(len(request.vars['counter']))
-        ref = db(db.itemmas.Ref_No == form.vars.Ref_No).select(db.itemmas.Descrip).first()
-        print ref
+    if form.process().accepted:
+        _range = xrange(len(request.vars['counter']))
+        # ref = db(db.itemmas.Ref_No == form.vars.Ref_No).select(db.itemmas.Descrip).first()
+
         # if len(_range) <= 1:
-        #     print "1 range"
+        db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.Invoi, Client = form.vars.Customer)
+        # db.trnmas.insert(Location = 1, Type = 3, Dte= request.now, Vouno=form.vars.Invoi,Ref_No = form.vars.Ref_No, Qty=form.vars.qty)
+        for i in _range:
+            db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.Invoi, Ref_No=form.vars['Ref_No'][i], Qty=form.vars['qty'][i])
         # else:
         #     for v in _range:
         #         print form.bars['RefNo'][v]
