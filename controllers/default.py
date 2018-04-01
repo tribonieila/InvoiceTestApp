@@ -20,7 +20,7 @@ def sales():
     head = THEAD(TR(TD('Date'),TD('Vouno'),TD('Customer'),TD('Total'),TD('Paid'),TD('Balance'),TD('Status'),TD('Actions')))
     for q in db().select(db.trnvou.ALL):
         #A('Fuel', _href=URL('default', 'Fuel', args=n.vehicle.id))
-        view = BUTTON('view', _type='button', _class='btn btn-primary btn-sm')
+        view = A('view', _class='btn btn-primary btn-sm', _href=URL('report', 'salereport', args=q.id))
         edit = A('edit', _class='btn btn-success btn-sm', _href=URL('default', 'editsale', args=q.id))
         #edit = BUTTON('edit', _type='button', _class='btn btn-success btn-sm', _href="URL("editsale", args=q.trnvou.id))
         dele = BUTTON('delete', _type='button', _class='btn btn-danger btn-sm')
@@ -60,30 +60,9 @@ def addsale():
                 db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
                 db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.inv, Ref_No=form.vars['refno'][i], Qty=form.vars['qty'][i])
     return dict(form = form)
-def addsales():
-    refno = db().select(db.itemmas.Ref_No)
-    form = SQLFORM.factory(
-        Field('counter', 'integer'),
-        Field('dte', 'date', default = request.now, label='Date'),
-        Field('Invoi', 'integer', label = 'Invoice No.'),
-        Field('Customer', 'string'),
-        Field('Ref_No', widget = SQLFORM.widgets.autocomplete(request, db.itemmas.Ref_No,  id_field=db.itemmas.id, limitby=(0,10), min_length=2)),
-        Field('qty', 'integer'))
-    if form.process().accepted:
-        _range = xrange(len(request.vars['counter']))
-        # ref = db(db.itemmas.Ref_No == form.vars.Ref_No).select(db.itemmas.Descrip).first()
 
-        # if len(_range) <= 1:
-        db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.Invoi, Client = form.vars.Customer)
-        # db.trnmas.insert(Location = 1, Type = 3, Dte= request.now, Vouno=form.vars.Invoi,Ref_No = form.vars.Ref_No, Qty=form.vars.qty)
-        for i in _range:
-            db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.Invoi, Ref_No=form.vars['Ref_No'][i], Qty=form.vars['qty'][i])
-        # else:
-        #     for v in _range:
-        #         print form.bars['RefNo'][v]
-    return dict(form = form, refno = refno)
 
-# ---- add sale page ----
+# ---- edit sale page ----
 def editsale():
     _id = db.trnvou(request.args(0)) #or redirect(URL('error'))
     form = SQLFORM(db.trnvou, _id, showid = False)
@@ -174,3 +153,26 @@ def download():
     #         DIV(A(SPAN(' Remove All', _class='ace-icon fa fa-times-circle bigger-120'),_class='btn btn-danger btn-xs'),_id='sheepItForm_remove_all'),_id='sheepItForm_controls'),_colspan='6'))),_class='table table-striped'),
     # DIV(_class='space space-8'),
     # INPUT(_type='submit', _value='submit', _class='btn btn-primary'))
+
+def addsales():
+    refno = db().select(db.itemmas.Ref_No)
+    form = SQLFORM.factory(
+        Field('counter', 'integer'),
+        Field('dte', 'date', default = request.now, label='Date'),
+        Field('Invoi', 'integer', label = 'Invoice No.'),
+        Field('Customer', 'string'),
+        Field('Ref_No', widget = SQLFORM.widgets.autocomplete(request, db.itemmas.Ref_No,  id_field=db.itemmas.id, limitby=(0,10), min_length=2)),
+        Field('qty', 'integer'))
+    if form.process().accepted:
+        _range = xrange(len(request.vars['counter']))
+        # ref = db(db.itemmas.Ref_No == form.vars.Ref_No).select(db.itemmas.Descrip).first()
+
+        # if len(_range) <= 1:
+        db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.Invoi, Client = form.vars.Customer)
+        # db.trnmas.insert(Location = 1, Type = 3, Dte= request.now, Vouno=form.vars.Invoi,Ref_No = form.vars.Ref_No, Qty=form.vars.qty)
+        for i in _range:
+            db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.Invoi, Ref_No=form.vars['Ref_No'][i], Qty=form.vars['qty'][i])
+        # else:
+        #     for v in _range:
+        #         print form.bars['RefNo'][v]
+    return dict(form = form, refno = refno)

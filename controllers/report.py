@@ -49,18 +49,30 @@ def _header_footer(canvas, doc):
     canvas.restoreState()
 
 ###########
-
+                # db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
+                # db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.inv, Ref_No=form.vars['refno'][i], Qty=form.vars['qty'][i])
+                # db.itemmas.Ref_No
+                # db.itemmas.Descrip
+                # db.itemmas.Price_Wsch
 def salereport():
     row = []
-    data= [['Top\nLeft', '', '02', '03', '04'],
-        ['', '', '12', '13', '14'],
-        ['20', '21', '22', 'Bottom\nRight', ''],
-        ['30', '31', '32', '', '']]
-    t = Table(data,style=[('GRID',(0,0),(-1,-1),0.5,colors.grey),
-        ('BACKGROUND',(0,0),(1,1),colors.palegreen),
-        ('SPAN',(0,0),(1,1)),
-        ('BACKGROUND',(-2,-2),(-1,-1), colors.pink),
-        ('SPAN',(-2,-2),(-1,-1)),])
+    ctr = 0
+    for c in db(db.trnvou.id == request.args(0)).select(db.trnvou.ALL):
+        data = [['Date: ', c.Dte, '02', '03', '04'],
+            ['Invoice No.:', c.Vouno, '12', '13', '14'],
+            ['Customer: ', c.Client, '22', 'Bottom\nRight', '']]
+        t = Table(data,style=[('GRID',(0,0),(-1,-1),0.5,colors.grey),
+            ('BACKGROUND',(0,0),(1,1),colors.palegreen),
+            ('BACKGROUND',(-2,-2),(-1,-1), colors.pink)])
+
+        tran = [['#','Reference No.','Description', 'Quantity', 'Price', 'Total']]
+        for t in db(db.trnmas.Vouno == c.Vouno).select(db.trnmas.ALL, db.itemmas.ALL, left=db.trnmas.on(db.itemmas.Ref_No == db.trnmas.Ref_No)):
+            ctr += 1
+            tran.append([ctr, t.itemmas.Ref_No, t.itemmas.Descrip, t.tranmas.Qty, t.itemmas.Price_Wsch, 'total'])
+
+    tran_tbl = Table(tran, colWidths=[25,25,25,25,25,25])
+    fle
+
     row.append(t)
     doc.build(row)#, onFirstPage=_header_footer, onLaterPages=_header_footer)
     pdf_data = open(tmpfilename,"rb").read()
