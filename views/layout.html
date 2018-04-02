@@ -50,6 +50,7 @@
     </nav>
 
     <div class="container-fluid main-container">
+      <div class="w2p_flash alert alert-dismissable">{{=response.flash or ''}}</div>
       <div class="row">
         <div class="col-md-12">
           <nav class="col-md-2 d-none d-md-block bg-light sidebar">
@@ -143,6 +144,10 @@
     <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
     <script src="{{=URL('static','js/web2py-bootstrap4.js')}}"></script>
 
+
+    <script src="{{=URL('static','js/ace/ace-elements.min.js')}}"></script>
+    <script src="{{=URL('static','js/ace/ace.min.js')}}"></script>
+    
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"</script>
 
     {{block page_js}}{{end page_js}}

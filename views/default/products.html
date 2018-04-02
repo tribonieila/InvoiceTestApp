@@ -30,7 +30,7 @@ $(document).ready(function() {
 		  {
 			"extend": "excel",
 			"exportOptions": {
-                    columns: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ] },
+                    columns: [ 0, 1, 2, 3, 4] },
             "text": "<i class='fa fa-file-excel-o bigger-110 green'></i> Export to Excel",
             "titleAttr": " Export to Excel",
             "className": "btn btn-link"
@@ -39,4 +39,17 @@ $(document).ready(function() {
 	} );
 	myTable.buttons().container().appendTo( '#' + myTable.table().container().id + ' .col-sm-6:eq(0)' );
 } );
+</script>
+<script type="text/javascript">
+jQuery(function($) {
+  _onclick="jQuery(this).fadeOut()"
+  $(".btn-danger").onClick="jQuery(this).fadeOut()" {
+    callback: function (result) {
+      if(result === true) {
+        ajax("{{=URL('delproduct/', )}}" + _id);
+        parent.fadeOut('slow');
+      }
+    }
+  }
+})
 </script>

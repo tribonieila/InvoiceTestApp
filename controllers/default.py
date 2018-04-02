@@ -92,17 +92,21 @@ def editsale():
 # ---- products page ----
 def products():
     row = []
-    head = THEAD(TR(TH('Reference No'),TH('Description'),TH('Price'),TH()))
+    head = THEAD(TR(TH('#'),TH('Reference No'),TH('Description'),TH('Price'),TH()))
 
     for q in db().select(db.itemmas.ALL):
-        view = A('view', _class='btn btn-primary btn-sm', _href=URL('report', 'printsale', args=q.id))
-        edit = A('edit', _class='btn btn-success btn-sm', _href=URL('default', 'editsale', args=q.id))
-        dele = A('delete', _class='btn btn-danger btn-sm')
+        view = A('view', _class='btn btn-primary btn-sm', _href=URL('report', 'viewproduct', args=q.id))
+        edit = A('edit', _class='btn btn-success btn-sm', _href=URL('default', 'editproduct', args=q.id))
+        dele = A('delete', _class='btn btn-danger btn-sm', callback=URL(args = q.id))
         btn = DIV(view, edit, dele, _class='btn-group', _role='group')
-        row.append(TR(TD(q.Ref_No),TD(q.Descrip),TD(q.Price_Wsch),TD(btn)))
+        row.append(TR(TD(),TD(q.Ref_No),TD(q.Descrip),TD(q.Price_Wsch),TD(btn)))
     body = TBODY(*row)
     table = TABLE(*[head, body], _class='table table-striped table-bordered table-hover')
     return dict(table = table)
+
+# ---- delroduct page ----
+def delproduct():
+    db(db.itemmas.id == request.args(1)).delete()
 
 # ---- addproduct page ----
 def addproduct():
@@ -111,8 +115,16 @@ def addproduct():
         Field('description', 'string'),
         Field('price', 'decimal'))
     if form.process().accepted:
-        response.flash = 'hello'
-    return locals()
+        db.itemmas.insert(Ref_No = form.vars.ref_no, Descrip = form.vars.description, Price_Wsch = form.vars.price)
+    return dict(form = form)
+
+# ---- editproduct page ----
+def editproduct():
+    form = SQLFORM(db.itemmas, request.args(0), showid = False, fields = ['Ref_No', 'Descrip','Price_Wsch'])
+    if form.process().accepted:
+        response.flash = "record updated"
+        db.itemmas.insert(Ref_No = form.vars.ref_no, Descrip = form.vars.description, Price_Wsch = form.vars.price)
+    return dict(form = form)
 
 # ---- customers page ----
 def customers():

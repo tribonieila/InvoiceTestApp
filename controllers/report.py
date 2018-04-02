@@ -89,3 +89,18 @@ def printsale():
     os.unlink(tmpfilename)
     response.headers['Content-Type']='application/pdf'
     return pdf_data
+
+def viewproduct():
+    ctr = 0
+    row = []
+    for t in db(db.itemmas.id == request.args(0)).select(db.itemmas.ALL):
+        data = [['Reference No: ', t.Ref_No],
+        ['Description:', t.Descrip],
+        ['Price: ', t.Price_Wsch]]
+    trn_table = Table(data,colWidths=[100,200],hAlign='LEFT')
+    row.append(trn_table)
+    doc.build(row, onFirstPage=_header_footer, onLaterPages=_header_footer)
+    pdf_data = open(tmpfilename,"rb").read()
+    os.unlink(tmpfilename)
+    response.headers['Content-Type']='application/pdf'
+    return pdf_data
