@@ -19,11 +19,9 @@ def sales():
     row = []
     head = THEAD(TR(TD('Date'),TD('Vouno'),TD('Customer'),TD('Total'),TD('Paid'),TD('Balance'),TD('Status'),TD('Actions')))
     for q in db().select(db.trnvou.ALL):
-        #A('Fuel', _href=URL('default', 'Fuel', args=n.vehicle.id))
-        view = A('view', _class='btn btn-primary btn-sm', _href=URL('report', 'salereport', args=q.id))
+        view = A('view', _class='btn btn-primary btn-sm', _href=URL('report', 'printsale', args=q.id))
         edit = A('edit', _class='btn btn-success btn-sm', _href=URL('default', 'editsale', args=q.id))
-        #edit = BUTTON('edit', _type='button', _class='btn btn-success btn-sm', _href="URL("editsale", args=q.trnvou.id))
-        dele = BUTTON('delete', _type='button', _class='btn btn-danger btn-sm')
+        dele = A('delete', _class='btn btn-danger btn-sm')
         btn = DIV(view, edit, dele, _class='btn-group', _role='group')
 
         row.append(TR(TD(q.Dte),TD(q.Vouno),TD(q.Client),TD((q.Totamount), _align='right'),TD(),TD(),TD(),TD(btn)))
@@ -41,7 +39,6 @@ def addsale():
             TD(INPUT(_class='form-control', _id='refno', _name='refno', _widget = SQLFORM.widgets.autocomplete(request, db.itemmas.Ref_No,
                 id_field = db.itemmas.id, limitby = (0,10), min_length = 2))),
             TD(INPUT(_class='form-control', _id='qty',_type='text', _name='qty')),
-
             TD(INPUT(_id='counter',_type='hidden', _name='counter'),A(SPAN(_class='ace-icon fa fa-times-circle bigger-120 '),'x',_class='btn btn-danger btn-xs', _id='sheepItForm_remove_current', _name = 'sheepItForm_remove_current')),_id="sheepItForm_template"),
             TR(TD('No Entry Field',_colspan='6'),_id="sheepItForm_noforms_template"),_id="sheepItForm"),
         TFOOT(TR(TD(DIV(
@@ -51,18 +48,42 @@ def addsale():
     DIV(_class='space space-8'),
     INPUT(_type='submit', _value='submit', _class='btn btn-primary'))
     if form.process().accepted:
+        db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
         _range = xrange(len(request.vars['counter']))
         if len(_range) <= 1:
             db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
             db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.inv, Ref_No=form.vars.refno, Qty=form.vars.qty)
         else:
             for i in _range:
-                db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
+                # db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
                 db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.inv, Ref_No=form.vars['refno'][i], Qty=form.vars['qty'][i])
     return dict(form = form)
 
 
-# ---- edit sale page ----
+def addsales():
+    refno = db().select(db.itemmas.Ref_No)
+    form = SQLFORM.factory(
+        Field('counter', 'integer'),
+        Field('dte', 'date', default = request.now, label='Date'),
+        Field('Invoi', 'integer', label = 'Invoice No.'),
+        Field('Customer', 'string'),
+        Field('Ref_No', widget = SQLFORM.widgets.autocomplete(request, db.itemmas.Ref_No,  id_field=db.itemmas.id, limitby=(0,10), min_length=2)),
+        Field('qty', 'integer'))
+    if form.process().accepted:
+        _range = xrange(len(request.vars['counter']))
+        # ref = db(db.itemmas.Ref_No == form.vars.Ref_No).select(db.itemmas.Descrip).first()
+
+        # if len(_range) <= 1:
+        db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.Invoi, Client = form.vars.Customer)
+        # db.trnmas.insert(Location = 1, Type = 3, Dte= request.now, Vouno=form.vars.Invoi,Ref_No = form.vars.Ref_No, Qty=form.vars.qty)
+        for i in _range:
+            db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.Invoi, Ref_No=form.vars['Ref_No'][i], Qty=form.vars['qty'][i])
+        # else:
+        #     for v in _range:
+        #         print form.bars['RefNo'][v]
+    return dict(form = form, refno = refno)
+
+# ---- add sale page ----
 def editsale():
     _id = db.trnvou(request.args(0)) #or redirect(URL('error'))
     form = SQLFORM(db.trnvou, _id, showid = False)
@@ -71,14 +92,29 @@ def editsale():
 # ---- products page ----
 def products():
     row = []
-    head = THEAD(TR(TH('Ref_No'),TH('Ref_No2'),TH('Ref_No3'),TH('Description'),TH('Brand Line'),TH()))
+    head = THEAD(TR(TH('Reference No'),TH('Description'),TH('Price'),TH()))
+
     for q in db().select(db.itemmas.ALL):
-        row.append(TR(TD(q.Ref_No),TD(q.Ref_No2),TD(q.Ref_No3),TD(q.Descrip),TD(q.Brand_Line),TD('view, edit, delete')))
+        view = A('view', _class='btn btn-primary btn-sm', _href=URL('report', 'printsale', args=q.id))
+        edit = A('edit', _class='btn btn-success btn-sm', _href=URL('default', 'editsale', args=q.id))
+        dele = A('delete', _class='btn btn-danger btn-sm')
+        btn = DIV(view, edit, dele, _class='btn-group', _role='group')
+        row.append(TR(TD(q.Ref_No),TD(q.Descrip),TD(q.Price_Wsch),TD(btn)))
     body = TBODY(*row)
     table = TABLE(*[head, body], _class='table table-striped table-bordered table-hover')
     return dict(table = table)
 
-# ---- products page ----
+# ---- addproduct page ----
+def addproduct():
+    form = SQLFORM.factory(
+        Field('ref_no','string', requires = IS_NOT_IN_DB(db, 'itemmas.Ref_No')),
+        Field('description', 'string'),
+        Field('price', 'decimal'))
+    if form.process().accepted:
+        response.flash = 'hello'
+    return locals()
+
+# ---- customers page ----
 def customers():
     row = []
     head = THEAD(TR(TH('Acct'),TH('Group'),TH('BS Code'),TH('BS Code'),TH('Name')))
@@ -153,26 +189,3 @@ def download():
     #         DIV(A(SPAN(' Remove All', _class='ace-icon fa fa-times-circle bigger-120'),_class='btn btn-danger btn-xs'),_id='sheepItForm_remove_all'),_id='sheepItForm_controls'),_colspan='6'))),_class='table table-striped'),
     # DIV(_class='space space-8'),
     # INPUT(_type='submit', _value='submit', _class='btn btn-primary'))
-
-def addsales():
-    refno = db().select(db.itemmas.Ref_No)
-    form = SQLFORM.factory(
-        Field('counter', 'integer'),
-        Field('dte', 'date', default = request.now, label='Date'),
-        Field('Invoi', 'integer', label = 'Invoice No.'),
-        Field('Customer', 'string'),
-        Field('Ref_No', widget = SQLFORM.widgets.autocomplete(request, db.itemmas.Ref_No,  id_field=db.itemmas.id, limitby=(0,10), min_length=2)),
-        Field('qty', 'integer'))
-    if form.process().accepted:
-        _range = xrange(len(request.vars['counter']))
-        # ref = db(db.itemmas.Ref_No == form.vars.Ref_No).select(db.itemmas.Descrip).first()
-
-        # if len(_range) <= 1:
-        db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.Invoi, Client = form.vars.Customer)
-        # db.trnmas.insert(Location = 1, Type = 3, Dte= request.now, Vouno=form.vars.Invoi,Ref_No = form.vars.Ref_No, Qty=form.vars.qty)
-        for i in _range:
-            db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.Invoi, Ref_No=form.vars['Ref_No'][i], Qty=form.vars['qty'][i])
-        # else:
-        #     for v in _range:
-        #         print form.bars['RefNo'][v]
-    return dict(form = form, refno = refno)
