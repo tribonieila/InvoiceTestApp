@@ -14,6 +14,17 @@ def index():
 
     return dict()
 
+def fillForm():
+    employeeIDS=db(db.employee).select(db.employee.ALL)
+    form = SQLFORM(db.attendance)
+    if form.process(session=None, formname='test').accepted:
+        response.flash = 'form accepted'
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form'
+    return dict(form = form, employeeIDS = employeeIDS)
+
 # ---- sales page ----
 def sales():
     row = []

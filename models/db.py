@@ -155,6 +155,14 @@ if configuration.get('scheduler.enabled'):
 #
 db = DAL('postgres://root:admin@localhost/TestApp')
 
+db.define_table('employee',
+     Field('name'), format = '%(name)s')
+
+db.define_table('attendance',
+    Field('employee_id',db.employee),
+    Field('attend','boolean'),
+    Field('comments','text'))
+
 db.define_table('itemmas',
     Field('Ref_No', 'string', length = 15, label = 'Reference No',requires = IS_NOT_IN_DB(db, 'itemmas.Ref_No')),
     Field('Ref_No2', 'string', length = 15),
