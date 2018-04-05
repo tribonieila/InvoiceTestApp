@@ -1,0 +1,6 @@
+{{extend 'layout.html'}}
+<form>
+    <input name="qty" type="number"/>
+   <input name="name" onchange="ajax('{{=URL('default', 'echo')}}', [,'qty','name'], 'target')" />
+</form>
+<div id="target"></div>
