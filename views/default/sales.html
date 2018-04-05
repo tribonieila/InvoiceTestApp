@@ -1,40 +1,30 @@
 {{extend 'layout.html'}}
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="{{=URL('static','js/bootstrap-confirmation.js')}}"></script>
+
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
     <h3 class="h2">Sales</h3>
-    <small class="text-muted">Please use the table below to navigate or filter the results. You can download the table as csv, excel and pdf.</small>
+    <small class="text-muted">Please use the table below to navigate or filter the results.</small>
 </div>
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
 <a class="btn btn-primary" href="{{=URL('addsale')}}" role="button">Add Sale</a>
 </div>
+
 {{=table}}
 
 <script>
-$(document).ready(function() {
-    var myTable = $('table.table')
-
-    .DataTable( {
-        bAutoWidth: false,
-        "columnDefs": [ {
-            "searchable": false,
-            "orderable": false
-        } ],
-        "order": [[ 1, 'asc' ]],
+var tbl = jQuery.noConflict();
+tbl(document).ready(function() {
+    var myTable = $('#table')
+    .DataTable({
+      "order": [[ 1, "desc" ]]
     });
-
-	new $.fn.dataTable.Buttons( myTable, {
-		buttons: [
-
-		  {
-			"extend": "excel",
-			"exportOptions": {
-                    columns: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ] },
-            "text": "<i class='fa fa-file-excel-o bigger-110 green'></i> Export to Excel",
-            "titleAttr": " Export to Excel",
-            "className": "btn btn-link"
-		  }
-		]
-	} );
-	myTable.buttons().container().appendTo( '#' + myTable.table().container().id + ' .col-sm-6:eq(0)' );
-} );
+    myTable.on('order.dt search.dt', function () {
+        myTable.table(this).column(0, {search:'applied', order:'applied'}).nodes().each(function (cell, i) {
+            cell.innerHTML = i+1;
+        });
+    }).draw();
+});
 </script>

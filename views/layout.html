@@ -22,11 +22,15 @@
     <!-- include stylesheets -->
 
 
-    <link rel="stylesheet" href='https://getbootstrap.com/dist/css/bootstrap.min.css'/>
+    <!-- <link rel="stylesheet" href='https://getbootstrap.com/dist/css/bootstrap.min.css'/> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{=URL('static','css/dashboard.css')}}"/>
     <link rel="stylesheet" href="{{=URL('static','css/web2py-bootstrap4.css')}}"/>
     <link rel="stylesheet" href="{{=URL('static','css/style.css')}}"/>
-    <link rel="stylesheet" href='https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css'/>
+    <!-- <link rel="stylesheet" href='https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css'/> -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.css"/> -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css"/>
+
     <link rel="shortcut icon" href="{{=URL('static','images/favicon.ico')}}" type="image/x-icon">
     <link rel="apple-touch-icon" href="{{=URL('static','images/favicon.png')}}">
     <!-- All JavaScript at the bottom, except for Modernizr which enables
@@ -139,16 +143,18 @@
 
     <!-- The javascript =============================== -->
 
-    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.js"></script> -->
     <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
     <script src="{{=URL('static','js/web2py-bootstrap4.js')}}"></script>
 
+    <!-- <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script> -->
 
-    <script src="{{=URL('static','js/ace/ace-elements.min.js')}}"></script>
-    <script src="{{=URL('static','js/ace/ace.min.js')}}"></script>
-    
-    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"</script>
+    <!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+
 
     {{block page_js}}{{end page_js}}
     {{if response.google_analytics_id:}}

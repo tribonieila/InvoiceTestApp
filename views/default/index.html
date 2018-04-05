@@ -1,5 +1,25 @@
 {{extend 'layout.html'}}
 
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="{{=URL('static','js/bootstrap-confirmation.js')}}"></script>
+<button class="btn btn-default" data-toggle="confirmation">Confirmation</button>
+
+<script>
+var c = jQuery.noConflict();
+c('[data-toggle=confirmation]').confirmation({
+  rootSelector: '[data-toggle=confirmation]',
+  // other options
+});
+
+// var p = jQuery.noConflict();
+// p(document).ready(function(){
+//     p('[data-toggle="popover"]').popover();
+// });
+</script>
+
+
                   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
                     <h1 class="h2">Dashboard</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">

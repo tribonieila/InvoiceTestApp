@@ -1,22 +1,6 @@
 {{extend 'layout.html'}}
-<form id="myform" action="whatever.php">
-    <lable name="text">enter text</label>
-    <input id="in" type="text" />
-
-    	<button type="submit" class="btn btn-primary">Save Invoice</button>
+<form>
+   <input name="name" onchange="ajax('{{=URL('default', 'echo')}}', ['name'], 'target')" />
 </form>
-
-<div class="results">
-    <ul class="list">
-    </ul>
-</div>
-
-<script>
-	(function($){
-    $('#myform').submit(function(e){
-        var val = $(this).find('#in').val();
-        $('ul.list').append('<li>' + val + '</li>');
-        e.preventDefault();
-    });
-})(jQuery);
-</script>
+<div id="target"></div>
+<div id="price"></div>
