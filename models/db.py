@@ -155,6 +155,9 @@ if configuration.get('scheduler.enabled'):
 #
 db = DAL('postgres://root:admin@localhost/TestApp')
 
+db.define_table('taxpayer',
+    Field('spouse_name'))
+
 db.define_table('employee',
      Field('name'), format = '%(name)s')
 

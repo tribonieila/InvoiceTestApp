@@ -14,35 +14,47 @@ def index():
 
     return dict()
 
-def fillForm():
-    employeeIDS=db(db.employee).select(db.employee.ALL)
-    form = SQLFORM(db.attendance)
-    if form.process(session=None, formname='test').accepted:
-        response.flash = 'form accepted'
-    elif form.errors:
-        response.flash = 'form has errors'
-    else:
-        response.flash = 'please fill the form'
-    return dict(form = form, employeeIDS = employeeIDS)
+# ---- products page ----
+def products():
+    row = []
+    head = THEAD(TR(TH('#'),TH('Reference No'),TH('Description'),TH('Price'),TH()))
+    for q in db().select(db.itemmas.ALL):
+        view = A('view', _class='btn btn-primary btn-sm', _href=URL('report', 'viewproduct', args=q.id))
+        edit = A('edit', _class='btn btn-success btn-sm', _href=URL('default', 'editproduct', args=q.id))
+        dele = A('delete', _class='btn btn-danger btn-sm', _onclick='jQuery(this).parent("div").parent("td").parent("tr").fadeOut()', callback=URL('delproduct',args = q.id))
+        btn = DIV(view, edit, dele, _class='btn-group', _role='group')
+        row.append(TR(TD(),TD(q.Ref_No),TD(q.Descrip),TD(q.Price_Wsch),TD(btn)))
+    body = TBODY(*row)
+    table = TABLE(*[head, body], _class='table table-striped table-bordered table-hover', _id='table')
+    return dict(table = table)
+# ---- delsale page ----
+def delsale():
+    db(db.trnvou.id == request.args(0)).delete()
 
 # ---- sales page ----
 def sales():
     row = []
-    head = THEAD(TR(TD('Date'),TD('Vouno'),TD('Customer'),TD('Total'),TD('Paid'),TD('Balance'),TD('Status'),TD('Actions')))
+    delete_confirmation = T('Are you sure you want to delete this record?')
+
+    head = THEAD(TR(TH('#'),TH('Date'),TH('Vouno'),TH('Customer'),TH('Total'),TH('Paid'),TH('Balance'),TH('Status'),TH()))
     for q in db().select(db.trnvou.ALL):
         view = A('view', _class='btn btn-primary btn-sm', _href=URL('report', 'printsale', args=q.id))
         edit = A('edit', _class='btn btn-success btn-sm', _href=URL('default', 'editsale', args=q.id))
-        dele = A('delete', _class='btn btn-danger btn-sm')
+        dele = A('delete', _class='btn btn-danger btn-sm', _onclick='jQuery(this).parent("div").parent("td").parent("tr").fadeOut()', callback=URL('delsale',args = q.id))
+        # <a href="#" data-toggle="popover" title="Popover Header" data-content="Some content inside the popover">Toggle popover</a>
+        # dele = A('delete', _class='btn btn-danger btn-sm', callback=URL(args=q.id), #_href=URL('default','delsale', args=q.id)
+        # **{'_data-toggle':'confirmation', '_data-id':(q.id)})
+        # dele = A(SPAN(_class = 'fa fa-trash bigger-110 blue'), _name='btndel',_title="Delete",
+        # callback=URL( args=n.id),_class='delete', data=dict(w2p_disable_with="*"),
+        # **{'_data-id':(n.id), '_data-in':(n.invoice_number)})
         btn = DIV(view, edit, dele, _class='btn-group', _role='group')
-
-        row.append(TR(TD(q.Dte),TD(q.Vouno),TD(q.Client),TD((q.Totamount), _align='right'),TD(),TD(),TD(),TD(btn)))
+        row.append(TR(TD(),TD(q.Dte),TD(q.Vouno),TD(q.Client),TD((q.Totamount), _align='right'),TD(),TD(),TD(),TD(btn)))
     body = TBODY(*row)
-    table = TABLE(*[head, body], _class='table table-striped table-bordered table-hover')
+    table = TABLE(*[head, body], _class='table table-striped table-bordered table-hover', _id='table')
     return dict(table = table)
-
 # ---- add sale page ----
 def addsale():
-    form = FORM(DIV(LABEL('Invoice No: ',_class='col-sm-2'), INPUT(_type='text', _id='inv',_name='inv', _placeholder='Invoice No', _class='form-control')),
+    form = FORM(DIV(LABEL('Invoice No: ',_class='col-sm-2'), INPUT(_type='text', _id='inv',_name='inv', _placeholder='Invoice No', requires = IS_NOT_IN_DB(db, 'trnvou.Vouno') ,_class='form-control')),
         DIV(_class='space space-8'),
         DIV(LABEL('Customer Name: ',_class='col-sm-2'),INPUT(_type='text', _id='customer',_name='customer', _placeholder='Customer', _class='form-control')),DIV(_class='space space-8'),
         TABLE(THEAD(TR(TH('#'),TH('Reference No'),TH('Quantity'),TH())),
@@ -61,17 +73,51 @@ def addsale():
     if form.process().accepted:
         db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
         _range = xrange(len(request.vars['counter']))
-        if len(_range) <= 1:
-            db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
-            db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.inv, Ref_No=form.vars.refno, Qty=form.vars.qty)
-        else:
-            for i in _range:
-                # db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
-                db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.inv, Ref_No=form.vars['refno'][i], Qty=form.vars['qty'][i])
+        # if len(_range) <= 1:
+        #     db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.inv, Client = form.vars.customer)
+        #     db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.inv, Ref_No=form.vars.refno, Qty=form.vars.qty)
+        # else:
+        for i in _range:
+            db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.inv, Ref_No=form.vars['refno'][i], Qty=form.vars['qty'][i])
     return dict(form = form)
+def test():
+    return locals()
+def new_post():
+    form = SQLFORM(db.post)
+    if form.accepts(request, formname=None):
+        return DIV("Message posted")
+    elif form.errors:
+        return TABLE(*[TR(k, v) for k, v in form.errors.items()])
+    return locals()
 
+def dicts_to_TABLE(content):
+        return TABLE(
+            THEAD(TR(*[TD(B(k)) for k in content[0].keys()])),
+            *[TR(*[TD(v) for k, v in row.iteritems()]) for row in content]
+        )
 
-def addsales():
+def echo():
+    row = []
+    to = 0;
+    query = db(db.itemmas.Ref_No == request.vars.name).select(db.itemmas.ALL)
+    for q in query:
+        to = request.vars.qty 
+        row.append(TR(TD(q.Ref_No),TD(q.Descrip),TD(q.Price_Wsch),TD(request.vars.qty),TD(to)))
+    body = TBODY(*row)
+    return body
+
+def itms():
+    row = []
+    x = 1
+    head = THEAD(TR(TD('#'),TD('Description')))
+    query = db(db.itemmas.Ref_No == request.vars.refno).select(db.itemmas.ALL)
+    for q in query:
+        sub_total = q.Price_Wsch * x
+        row.append(TR(TD(q.Ref_No),TD(q.Descrip),TD(q.Price_Wsch)))
+    body = TBODY(*row)
+    return body
+
+def addsale2():
     refno = db().select(db.itemmas.Ref_No)
     form = SQLFORM.factory(
         Field('counter', 'integer'),
@@ -81,43 +127,27 @@ def addsales():
         Field('Ref_No', widget = SQLFORM.widgets.autocomplete(request, db.itemmas.Ref_No,  id_field=db.itemmas.id, limitby=(0,10), min_length=2)),
         Field('qty', 'integer'))
     if form.process().accepted:
-        _range = xrange(len(request.vars['counter']))
-        # ref = db(db.itemmas.Ref_No == form.vars.Ref_No).select(db.itemmas.Descrip).first()
-
-        # if len(_range) <= 1:
-        db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.Invoi, Client = form.vars.Customer)
-        # db.trnmas.insert(Location = 1, Type = 3, Dte= request.now, Vouno=form.vars.Invoi,Ref_No = form.vars.Ref_No, Qty=form.vars.qty)
-        for i in _range:
-            db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.Invoi, Ref_No=form.vars['Ref_No'][i], Qty=form.vars['qty'][i])
-        # else:
-        #     for v in _range:
-        #         print form.bars['RefNo'][v]
-    return dict(form = form, refno = refno)
+        response.flash = 'hello'
+        # db.trnvou.insert(Location = 1,Type = 3, Dte = request.now, Vouno = form.vars.Invoi, Client = form.vars.Customer)
+        # _range = xrange(len(request.vars['counter']))
+        # for i in _range:
+        #     db.trnmas.insert(Location = 1, Type = 3, Dte=request.now, Vouno=form.vars.Invoi, Ref_No=form.vars['Ref_No'][i], Qty=form.vars['qty'][i])
+    return dict(form = form)
 
 # ---- add sale page ----
 def editsale():
     _id = db.trnvou(request.args(0)) #or redirect(URL('error'))
-    form = SQLFORM(db.trnvou, _id, showid = False)
+    form = SQLFORM(db.trnvou, _id, showid = False, fields = ['Dte', 'Vouno','Client'])
+    if form.process().accepted:
+        response.flash = 'form accepted'
+    elif form.errors:
+        response.flash = 'form has errors'
     return dict(form = form)
 
-# ---- products page ----
-def products():
-    row = []
-    head = THEAD(TR(TH('#'),TH('Reference No'),TH('Description'),TH('Price'),TH()))
-
-    for q in db().select(db.itemmas.ALL):
-        view = A('view', _class='btn btn-primary btn-sm', _href=URL('report', 'viewproduct', args=q.id))
-        edit = A('edit', _class='btn btn-success btn-sm', _href=URL('default', 'editproduct', args=q.id))
-        dele = A('delete', _class='btn btn-danger btn-sm', callback=URL(args = q.id))
-        btn = DIV(view, edit, dele, _class='btn-group', _role='group')
-        row.append(TR(TD(),TD(q.Ref_No),TD(q.Descrip),TD(q.Price_Wsch),TD(btn)))
-    body = TBODY(*row)
-    table = TABLE(*[head, body], _class='table table-striped table-bordered table-hover')
-    return dict(table = table)
 
 # ---- delroduct page ----
 def delproduct():
-    db(db.itemmas.id == request.args(1)).delete()
+    db(db.itemmas.id == request.args(0)).delete()
 
 # ---- addproduct page ----
 def addproduct():
